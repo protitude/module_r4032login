@@ -1,6 +1,6 @@
-name: Redirect 403 to User Login
+name: 'Redirect 403 to User Login'
 type: module
-description: Redirect anonymous users from 403 Access Denied pages to the /user/login page.
+description: 'Redirect anonymous users from 403 Access Denied pages to the /user/login page.'
 core: 8.x
 configure: system.admin_config_system
 dependencies:
