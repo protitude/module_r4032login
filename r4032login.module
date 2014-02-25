@@ -30,20 +30,27 @@ function r4032login_access_callback() {
 
 /**
  * Implements hook_form_FORM_ID_alter().
+ *
+ * Alters the System module's site information settings form to add additional
+ * r4032login settings.
+ *
+ * @see r4032login_form_system_site_information_settings_form_submit()
  */
 function r4032login_form_system_site_information_settings_alter(&$form, &$form_state, $form_id) {
+  $config = \Drupal::config('r4032login.settings');
+
   $form['error_page']['r4032login_display_denied_message'] = array(
     '#type' => 'checkbox',
     '#weight' => 5,
     '#title' => t('Display access denied message on login page'),
-    '#default_value' => variable_get('r4032login_display_denied_message', TRUE),
+    '#default_value' => $config->get('display_denied_message'),
   );
   $form['error_page']['r4032login_access_denied_message'] = array(
     '#type' => 'textarea',
     '#rows' => 1,
     '#weight' => 6,
     '#title' => t("User login 'access denied' message"),
-    '#default_value' => variable_get('r4032login_access_denied_message', t('Access denied. You must log in to view this page.')),
+    '#default_value' => $config->get('access_denied_message'),
     '#states' => array(
       'invisible' => array('input[name="r4032login_display_denied_message"]' => array(
         'checked' => FALSE,
@@ -55,14 +62,14 @@ function r4032login_form_system_site_information_settings_alter(&$form, &$form_s
     '#weight' => 7,
     '#title' => t("Redirect authenticated users to"),
     '#description' => t('If an authenticated user tries to access a page they can not, redirect them to the given page. Use &lt;front&gt; for the front page, leave blank for a default access denied page.'),
-    '#default_value' => variable_get('r4032login_redirect_authenticated_users_to', ''),
+    '#default_value' => $config->get('redirect_authenticated_users_to'),
   );
   $form['error_page']['r4032login_user_login_path'] = array(
     '#type' => 'textfield',
     '#weight' => 8,
     '#title' => t("Path to user login form"),
     '#description' => t('The path to the user login form. Omit the beginning slash, ie: user/login'),
-    '#default_value' => variable_get('r4032login_user_login_path', 'user/login'),
+    '#default_value' => $config->get('user_login_path'),
   );
   $options = array('301' => '301 Moved Permanently', '302' => '302 Found');
   $form['error_page']['r4032login_default_redirect_code'] = array(
@@ -71,7 +78,7 @@ function r4032login_form_system_site_information_settings_alter(&$form, &$form_s
     '#title' => t("HTTP redirect code"),
     '#description' => t('The redirect code to send. 301 responses may be cached by browsers and proxies, so 302 is normally the correct choice.'),
     '#options' => $options,
-    '#default_value' => variable_get('r4032login_default_redirect_code', 302),
+    '#default_value' => $config->get('default_redirect_code'),
   );
   $form['error_page']['matching_paths'] = array(
     '#type' => 'details',
@@ -83,10 +90,26 @@ function r4032login_form_system_site_information_settings_alter(&$form, &$form_s
   $form['error_page']['matching_paths']['r4032login_match_noredirect_pages'] = array(
     '#type' => 'textarea',
     '#title' => '<span class="element-invisible">' . t('Only the listed pages') . '</span>',
-    '#default_value' => variable_get('r4032login_match_noredirect_pages', ''),
-    '#description' => t('Instead of redirecting, the user will get an access deined response and see the standard login form. This may be useful when the response code is important - such as for removing outdated content from search engines.  Use the path node/* for all content.') . ' ' . t("Specify pages by using their paths. Enter one path per line. The '*' character is a wildcard. Example paths are %blog for the blog page and %blog-wildcard for every personal blog. %front is the front page.", array('%blog' => 'blog', '%blog-wildcard' => 'blog/*', '%front' => '<front>')),
+    '#default_value' => $config->get('match_noredirect_pages'),
+    '#description' => t('Instead of redirecting, the user will get an access defined response and see the standard login form. This may be useful when the response code is important - such as for removing outdated content from search engines.  Use the path node/* for all content.') . ' ' . t("Specify pages by using their paths. Enter one path per line. The '*' character is a wildcard. Example paths are %blog for the blog page and %blog-wildcard for every personal blog. %front is the front page.", array('%blog' => 'blog', '%blog-wildcard' => 'blog/*', '%front' => '<front>')),
   );
-  return system_settings_form($form);
+  $form['#submit'][] = 'r4032login_form_system_site_information_settings_form_submit';
+}
+
+/**
+ * Form submission handler for system_site_information_settings().
+ *
+ * @see r4032login_form_system_site_information_settings_alter()
+ */
+function r4032login_form_system_site_information_settings_form_submit($form, &$form_state) {
+  \Drupal::config('r4032login.settings')
+    ->set('display_denied_message', $form_state['values']['r4032login_display_denied_message'])
+    ->set('access_denied_message', $form_state['values']['r4032login_access_denied_message'])
+    ->set('redirect_authenticated_users_to', $form_state['values']['r4032login_redirect_authenticated_users_to'])
+    ->set('user_login_path', $form_state['values']['r4032login_user_login_path'])
+    ->set('default_redirect_code', $form_state['values']['r4032login_default_redirect_code'])
+    ->set('match_noredirect_pages', $form_state['values']['r4032login_match_noredirect_pages'])
+    ->save();
 }
 
 /**
