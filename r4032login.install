@@ -6,12 +6,8 @@
  */
 
 /**
- * Implements hook_enable().
+ * Implements hook_install().
  */
-function r4032login_enable() {
-  variable_set('site_403', 'r4032login');
-}
-
 /**
  * Implements hook_disable().
  */
