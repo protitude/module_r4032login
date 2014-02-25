@@ -25,8 +25,7 @@ class R4032LoginController extends ControllerBase {
    *   A response that redirects 403 Access Denied pages user login page.
    */
   public function redirect4032Login() {
-    global $user, $language;
-    if (user_is_anonymous()) {
+    if ($this->currentUser()->isAnonymous()) {
       // Show the access denied message.
       if (\Drupal::config('r4032login.settings')->get('display_denied_message') && empty($_POST)) {
         $message = \Drupal::config('r4032login.settings')->get('access_denied_message');
