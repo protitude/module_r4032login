@@ -8,7 +8,8 @@
 namespace Drupal\r4032login\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
-use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+
 
 /**
  * Controller routines for r4032login routes.
@@ -66,14 +67,13 @@ class R4032LoginController extends ControllerBase {
     else {
       // Check to see if we are to redirect the user.
       $redirect = \Drupal::config('r4032login.settings')->get('redirect_authenticated_users_to');
-      if (empty($redirect)) {
-        // Display the default access denied page.
-        return theme('r4032login_denied');
+      if ($redirect) {
+        // Custom access denied page for logged in users.
+        return $this->redirect($redirect);
       }
       else {
-        // Custom access denied page for logged in users.
-        header('Location: ' . url($redirect, array('absolute' => TRUE)));
-        drupal_exit();
+        // Display the default access denied page.
+        throw new AccessDeniedHttpException();
       }
     }
   }

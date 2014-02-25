@@ -129,12 +129,3 @@ function r4032login_theme() {
   );
 }
 
-/**
-
-/**
- * Display themed Access denied page.
- */
-function theme_r4032login_denied() {
-  drupal_set_title(t('Access denied'));
-  return '<p>' . t('You are not authorized to access this page.') . '</p>';
-}
