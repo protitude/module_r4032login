@@ -27,13 +27,15 @@ class R4032LoginController extends ControllerBase {
    */
   public function redirect4032Login() {
     if ($this->currentUser()->isAnonymous()) {
+      $config = \Drupal::config('r4032login.settings');
+
       // Show the access denied message.
-      if (\Drupal::config('r4032login.settings')->get('display_denied_message') && empty($_POST)) {
-        $message = \Drupal::config('r4032login.settings')->get('access_denied_message');
+      if ($config->get('display_denied_message') && empty($_POST)) {
+        $message = $config->get('access_denied_message');
         drupal_set_message($message, 'error');
       }
       $page_match = FALSE;
-      $pages = \Drupal::config('r4032login.settings')->get('match_noredirect_pages');
+      $pages = $config->get('match_noredirect_pages');
       if ($pages) {
         // When on an access denied page, Drupal stores the original path in
         // $_GET['destination'] in drupal_deliver_html_page().
@@ -51,8 +53,8 @@ class R4032LoginController extends ControllerBase {
       }
       // Handle redirection to the login form.
       // using drupal_goto() with destination set causes a recursive redirect loop
-      $login_path = \Drupal::config('r4032login.settings')->get('user_login_path');
-      $code = \Drupal::config('r4032login.settings')->get('default_redirect_code');
+      $login_path = $config->get('user_login_path');
+      $code = $config->get('default_redirect_code');
       // The code in drupal_get_destination() doesn't preserve any query string
       // on 403 pages, so reproduce the part we want here.
       $path = $_GET['destination'];
