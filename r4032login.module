@@ -9,13 +9,10 @@
  * Implements hook_menu().
  */
 function r4032login_menu() {
-  $items = array();
   $items['r4032login'] = array(
-    'page callback' => 'r4032login_redirect',
-    'access callback' => 'r4032login_access_callback',
-    'type' => MENU_CALLBACK,
     'title' => 'Access denied',
     'description' => 'You are not authorized to access this page.',
+    'route_name' => 'r4032login.redirect',
   );
   return $items;
 }
