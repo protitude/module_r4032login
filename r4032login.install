@@ -8,27 +8,18 @@
 /**
  * Implements hook_install().
  */
-/**
- * Implements hook_disable().
- */
-function r4032login_disable() {
-  variable_del('site_403');
+function r4032login_install() {
+  \Drupal::config('system.site')->set('page.403', 'r4032login')->save();
 }
 
 /**
  * Implements hook_uninstall().
  */
 function r4032login_uninstall() {
-  variable_del('r4032login_display_denied_message');
-  variable_del('r4032login_access_denied_message');
-  variable_del('r4032login_user_login_path');
-  variable_del('r4032login_default_redirect_code');
-  variable_del('r4032login_match_noredirect_pages');
-}
-
-/**
- * Drupal 7 has better handling for visiting the user registration page while logged in.
- */
-function r4032login_update_7000() {
-  variable_del('r4032login_user_register_message');
+  \Drupal::config('system.site')->clear('page.403')->save();
+  \Drupal::config('r4032login.settings')->clear('display_denied_message')->save();
+  \Drupal::config('r4032login.settings')->clear('access_denied_message')->save();
+  \Drupal::config('r4032login.settings')->clear('user_login_path')->save();
+  \Drupal::config('r4032login.settings')->clear('default_redirect_code')->save();
+  \Drupal::config('r4032login.settings')->clear('match_noredirect_pages')->save();
 }
