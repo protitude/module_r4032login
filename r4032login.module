@@ -74,7 +74,7 @@ function r4032login_form_system_site_information_settings_alter(&$form, &$form_s
     '#default_value' => variable_get('r4032login_default_redirect_code', 302),
   );
   $form['error_page']['matching_paths'] = array(
-    '#type' => 'fieldset',
+    '#type' => 'details',
     '#title' => t('Skip redirect for matching pages'),
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
