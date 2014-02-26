@@ -10,7 +10,6 @@ namespace Drupal\r4032login\Controller;
 use Drupal\Core\Controller\ControllerBase;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
-
 /**
  * Controller routines for r4032login routes.
  */
@@ -28,9 +27,10 @@ class R4032LoginController extends ControllerBase {
   public function redirect4032Login() {
     if ($this->currentUser()->isAnonymous()) {
       $config = \Drupal::config('r4032login.settings');
-
-      // Show the access denied message.
-      if ($config->get('display_denied_message') && empty($_POST)) {
+      $post_params = \Drupal::request()->request->all();
+      // Show access denied message if set and if $_POST is empty to
+      // avoid repeated messages.
+      if ($config->get('display_denied_message') && empty($post_params)) {
         $message = $config->get('access_denied_message');
         drupal_set_message($message, 'error');
       }
