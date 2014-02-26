@@ -18,14 +18,6 @@ function r4032login_menu() {
 }
 
 /**
- * Without an access callback on the menu item for r4032login_redirect,
- * the redirect will be 403 and just have the default access denied page anyway.
- */
-function r4032login_access_callback() {
-  return TRUE;
-}
-
-/**
  * Implements hook_form_FORM_ID_alter().
  *
  * Alters the System module's site information settings form to add additional
