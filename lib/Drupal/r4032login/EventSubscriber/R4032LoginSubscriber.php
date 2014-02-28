@@ -54,7 +54,7 @@ class R4032LoginSubscriber implements EventSubscriberInterface, DestructableInte
    * @return array
    *   An array of event listener definitions.
    */
-  static function getSubscribedEvents() {
+  public static function getSubscribedEvents() {
     $events[KernelEvents::EXCEPTION][] = array('onKernelRequestAccessCheck', 0);
     return $events;
   }
