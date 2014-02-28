@@ -58,10 +58,11 @@ class R4032LoginAccessSubscriber extends AccessSubscriber {
   }
 
   /**
-   * Redirects anonymous users from 403 Access Denied pages to the /user/login
-   * page with a message explaining that they must log in to view the requested
-   * page and a query string parameter appended to the url to return
-   * after login.
+   * Redirects anonymous users from 403 Access Denied pages.
+   *
+   * Redirect to the /user/login page with a message explaining that they
+   * must log in to view the requested page and a query string parameter
+   * appended to the url to return after login.
    *
    * @param \Symfony\Component\HttpKernel\Event\GetResponseEvent $event
    *   The Event to process.
@@ -75,7 +76,7 @@ class R4032LoginAccessSubscriber extends AccessSubscriber {
       // Show custom access denied message if set.
       if ($config->get('display_denied_message')) {
         $message = $config->get('access_denied_message');
-        drupal_set_message(t($message), 'error');
+        drupal_set_message($message, 'error');
       }
       // Handle redirection to the login form.
       $login_path = $config->get('user_login_path');
