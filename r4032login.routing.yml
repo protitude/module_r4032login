@@ -1,7 +1,0 @@
-r4032login.redirect:
-  path: '/r4032login'
-  defaults:
-    _controller: '\Drupal\r4032login\Controller\R4032LoginController::redirect4032Login'
-    _title: 'Access denied'
-  requirements:
-    _access: 'TRUE'
