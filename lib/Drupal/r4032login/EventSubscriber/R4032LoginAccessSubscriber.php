@@ -69,12 +69,10 @@ class R4032LoginAccessSubscriber extends AccessSubscriber {
   public function redirect4032Login(GetResponseEvent $event) {
     $config = \Drupal::config('r4032login.settings');
     if ($this->currentUser->isAnonymous()) {
-      $post_params = \Drupal::request()->request->all();
-      // Show access denied message if set and if $_POST is empty to
-      // avoid repeated messages.
-      if ($config->get('display_denied_message') && empty($post_params)) {
+      // Show custom access denied message if set.
+      if ($config->get('display_denied_message')) {
         $message = $config->get('access_denied_message');
-        drupal_set_message($message, 'error');
+        drupal_set_message(t($message), 'error');
       }
       // Handle redirection to the login form.
       $login_path = $config->get('user_login_path');
