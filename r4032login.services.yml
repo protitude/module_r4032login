@@ -1,0 +1,7 @@
+services:
+  r4032login.subscriber:
+    class: Drupal\r4032login\EventSubscriber\R4032LoginSubscriber
+    arguments: ['@state']
+    tags:
+      - { name: event_subscriber }
+      - { name: needs_destruction }
