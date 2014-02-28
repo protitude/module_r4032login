@@ -38,9 +38,9 @@ function r4032login_form_system_site_information_settings_alter(&$form, &$form_s
     '#description' => t('The message text displayed to users who are denied access to the page.'),
     '#default_value' => $config->get('access_denied_message'),
     '#states' => array(
-      'invisible' => array('input[name="r4032login_display_denied_message"]' => array(
-        'checked' => FALSE,
-      )),
+      'invisible' => array(
+        'input[name="r4032login_display_denied_message"]' => array('checked' => FALSE),
+      ),
     ),
   );
   $form['error_page']['r4032login']['r4032login_redirect_authenticated_users_to'] = array(
@@ -77,7 +77,12 @@ function r4032login_form_system_site_information_settings_alter(&$form, &$form_s
     '#type' => 'textarea',
     '#title' => '<span class="element-invisible">' . t('Only the listed pages') . '</span>',
     '#default_value' => $config->get('match_noredirect_pages'),
-    '#description' => t('Instead of redirecting, the user will get an access defined response and see the standard login form. This may be useful when the response code is important - such as for removing outdated content from search engines.  Use the path node/* for all content.') . ' ' . t("Specify pages by using their paths. Enter one path per line. The '*' character is a wildcard. Example paths are %blog for the blog page and %blog-wildcard for every personal blog. %front is the front page.", array('%blog' => 'blog', '%blog-wildcard' => 'blog/*', '%front' => '<front>')),
+    '#description' => t('Instead of redirecting, the user will get an access defined response and see the standard login form. This may be useful when the response code is important - such as for removing outdated content from search engines.  Use the path node/* for all content.') . ' ' . t("Specify pages by using their paths. Enter one path per line. The '*' character is a wildcard. Example paths are %blog for the blog page and %blog-wildcard for every personal blog. %front is the front page.", array(
+      '%blog' => 'blog',
+      '%blog-wildcard' =>
+      'blog/*',
+      '%front' => '<front>',
+    )),
   );
   $form['#submit'][] = 'r4032login_form_system_site_information_settings_form_submit';
 }
@@ -108,4 +113,3 @@ function r4032login_theme() {
     ),
   );
 }
-
