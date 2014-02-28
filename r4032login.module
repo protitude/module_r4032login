@@ -6,18 +6,6 @@
  */
 
 /**
- * Implements hook_menu().
- */
-function r4032login_menu() {
-  $items['r4032login'] = array(
-    'title' => 'Access denied',
-    'description' => 'You are not authorized to access this page.',
-    'route_name' => 'r4032login.redirect',
-  );
-  return $items;
-}
-
-/**
  * Implements hook_form_FORM_ID_alter().
  *
  * Alters the System module's site information settings form to add additional
