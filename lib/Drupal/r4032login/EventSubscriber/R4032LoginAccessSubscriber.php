@@ -54,6 +54,9 @@ class R4032LoginAccessSubscriber extends AccessSubscriber {
     if (!$access) {
       $response = $this->redirect4032Login($event);
       $event->setResponse($response);
+    }
+  }
+
   /**
    * Redirects anonymous users from 403 Access Denied pages to the /user/login
    * page with a message explaining that they must log in to view the requested

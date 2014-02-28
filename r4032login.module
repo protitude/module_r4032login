@@ -57,7 +57,7 @@ function r4032login_form_system_site_information_settings_alter(&$form, &$form_s
     '#description' => t('The path to the user login form. Omit the beginning slash, ie: user/login.'),
     '#default_value' => $config->get('user_login_path'),
   );
-  $options = array('301' => '301 Moved Permanently', '302' => '302 Found');
+  $options = array('302' => '302 Found', '301' => '301 Moved Permanently');
   $form['error_page']['r4032login']['r4032login_default_redirect_code'] = array(
     '#type' => 'select',
     '#weight' => 9,
