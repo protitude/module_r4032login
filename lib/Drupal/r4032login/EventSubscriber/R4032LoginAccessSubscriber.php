@@ -52,8 +52,47 @@ class R4032LoginAccessSubscriber extends AccessSubscriber {
     $request->attributes->remove('_controller_request');
 
     if (!$access) {
-      $response = new RedirectResponse(url('user/login', array('absolute' => TRUE)));
+      $response = $this->redirect4032Login($event);
       $event->setResponse($response);
+  /**
+   * Redirects anonymous users from 403 Access Denied pages to the /user/login
+   * page with a message explaining that they must log in to view the requested
+   * page and a query string parameter appended to the url to return
+   * after login.
+   *
+   * @param \Symfony\Component\HttpKernel\Event\GetResponseEvent $event
+   *   The Event to process.
+   *
+   * @return \Symfony\Component\HttpFoundation\RedirectResponse
+   *   A response that redirects 403 Access Denied pages user login page.
+   */
+  public function redirect4032Login(GetResponseEvent $event) {
+    $config = \Drupal::config('r4032login.settings');
+    if ($this->currentUser->isAnonymous()) {
+      $post_params = \Drupal::request()->request->all();
+      // Show access denied message if set and if $_POST is empty to
+      // avoid repeated messages.
+      if ($config->get('display_denied_message') && empty($post_params)) {
+        $message = $config->get('access_denied_message');
+        drupal_set_message($message, 'error');
+      }
+      // Handle redirection to the login form.
+      // using drupal_goto() with destination set causes a recursive redirect loop
+      $login_path = $config->get('user_login_path');
+      $code = $config->get('default_redirect_code');
+      return new RedirectResponse(url($login_path, array('absolute' => TRUE)), $code);
+    }
+    else {
+      // Check to see if we are to redirect the user.
+      $redirect = $config->get('redirect_authenticated_users_to');
+      if ($redirect) {
+        // Custom access denied page for logged in users.
+        return new RedirectResponse(url($redirect, array('absolute' => TRUE)));
+      }
+      else {
+        // Display the default access denied page.
+        throw new AccessDeniedHttpException();
+      }
     }
   }
 }
