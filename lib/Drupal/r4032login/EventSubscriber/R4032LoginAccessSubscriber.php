@@ -77,10 +77,9 @@ class R4032LoginAccessSubscriber extends AccessSubscriber {
         drupal_set_message($message, 'error');
       }
       // Handle redirection to the login form.
-      // using drupal_goto() with destination set causes a recursive redirect loop
       $login_path = $config->get('user_login_path');
       $code = $config->get('default_redirect_code');
-      return new RedirectResponse(url($login_path, array('absolute' => TRUE)), $code);
+      return new RedirectResponse(url($login_path, array('absolute' => TRUE, 'query' => drupal_get_destination())), $code);
     }
     else {
       // Check to see if we are to redirect the user.
