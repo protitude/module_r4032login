@@ -8,7 +8,6 @@
 namespace Drupal\r4032login\EventSubscriber;
 
 use Drupal\Core\Session\AccountInterface;
-use Drupal\Core\DestructableInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -17,7 +16,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 /**
  * Redirect 403 to User Login event subscriber.
  */
-class R4032LoginSubscriber implements EventSubscriberInterface, DestructableInterface {
+class R4032LoginSubscriber implements EventSubscriberInterface {
 
   /**
    * The current user.
@@ -83,12 +82,5 @@ class R4032LoginSubscriber implements EventSubscriberInterface, DestructableInte
   public static function getSubscribedEvents() {
     $events[KernelEvents::EXCEPTION][] = array('onKernelExceptionCheck', 0);
     return $events;
-  }
-
-  /**
-   * Implements \Drupal\Core\DestructableInterface::destruct().
-   */
-  public function destruct() {
-    $this->state->set('r4032login.subscriber.destructed', TRUE);
   }
 }
