@@ -7,6 +7,7 @@
 
 namespace Drupal\r4032login\EventSubscriber;
 
+use Drupal\Core\Config\ConfigFactory;
 use Drupal\Core\Session\AccountInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
@@ -20,6 +21,13 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 class R4032LoginSubscriber implements EventSubscriberInterface {
 
   /**
+   * The configuration object.
+   *
+   * @var \Drupal\Core\Config\Config
+   */
+  protected $config;
+
+  /**
    * The current user.
    *
    * @var \Drupal\Core\Session\AccountInterface
@@ -29,10 +37,13 @@ class R4032LoginSubscriber implements EventSubscriberInterface {
   /**
    * Constructs a new R4032LoginSubscriber.
    *
+   * @param \Drupal\Core\Config\ConfigFactory $config_factory
+   *   The configuration system.
    * @param \Drupal\Core\Session\AccountInterface $current_user
    *   The current user.
    */
-  public function __construct(AccountInterface $current_user) {
+  public function __construct(ConfigFactory $config_factory, AccountInterface $current_user) {
+    $this->config = $config_factory->get('r4032login.settings');
     $this->currentUser = $current_user;
   }
 
@@ -46,22 +57,21 @@ class R4032LoginSubscriber implements EventSubscriberInterface {
    *   A response that redirects 403 Access Denied pages user login page.
    */
   public function onKernelExceptionCheck(GetResponseEvent $event) {
-    $config = \Drupal::config('r4032login.settings');
     if ($this->currentUser->isAnonymous()) {
       // Show custom access denied message if set.
-      if ($config->get('display_denied_message')) {
-        $message = $config->get('access_denied_message');
+      if ($this->config->get('display_denied_message')) {
+        $message = $this->config->get('access_denied_message');
         drupal_set_message($message, 'error');
       }
       // Handle redirection to the login form.
-      $login_path = $config->get('user_login_path');
-      $code = $config->get('default_redirect_code');
+      $login_path = $this->config->get('user_login_path');
+      $code = $this->config->get('default_redirect_code');
       $response = new RedirectResponse(url($login_path, array('absolute' => TRUE, 'query' => drupal_get_destination())), $code);
       $event->setResponse($response);
     }
     else {
       // Check to see if we are to redirect the user.
-      $redirect = $config->get('redirect_authenticated_users_to');
+      $redirect = $this->config->get('redirect_authenticated_users_to');
       if ($redirect) {
         // Custom access denied page for logged in users.
         $response = new RedirectResponse(url($redirect, array('absolute' => TRUE)));
