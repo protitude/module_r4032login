@@ -18,12 +18,12 @@ r4032login.settings:
       type: mapping
       label: 'HTTP redirect code'
       mapping:
-        301:
-          type: integer
-          label: '301 Moved Permanently'
         302:
           type: integer
           label: '302 Found'
+        301:
+          type: integer
+          label: '301 Moved Permanently'
     match_noredirect_pages:
       type: text
       label: 'Only the listed pages'
