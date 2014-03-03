@@ -20,8 +20,7 @@ function r4032login_form_system_site_information_settings_alter(&$form, &$form_s
     '#type' => 'details',
     '#title' => t('Redirect 403 to User Login'),
     '#description' => t('Redirect anonymous users from 403 Access Denied pages to the user/login page.'),
-    '#collapsible' => TRUE,
-    '#collapsed' => FALSE,
+    '#open' => TRUE,
   );
   $form['error_page']['r4032login']['r4032login_display_denied_message'] = array(
     '#type' => 'checkbox',
