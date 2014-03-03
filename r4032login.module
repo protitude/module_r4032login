@@ -83,7 +83,22 @@ function r4032login_form_system_site_information_settings_alter(&$form, &$form_s
       '%front' => '<front>',
     )),
   );
+  $form['#validate'][] = 'r4032login_form_system_site_information_settings_validate';
   $form['#submit'][] = 'r4032login_form_system_site_information_settings_form_submit';
+}
+
+/**
+ * Form validation handler for system_site_information_settings().
+ *
+ * @see r4032login_form_system_site_information_settings_alter()
+ */
+function r4032login_form_system_site_information_settings_validate($form, &$form_state) {
+  if (!empty($form_state['values']['r4032login_redirect_authenticated_users_to']) && !drupal_valid_path(($form_state['values']['r4032login_redirect_authenticated_users_to']))) {
+    \Drupal::formBuilder()->setErrorByName('r4032login_redirect_authenticated_users_to', $form_state, t("The redirect authenticated users path '%path' is either invalid or you do not have access to it.", array('%path' => $form_state['values']['r4032login_user_login_path'])));
+  }
+  if (!empty($form_state['values']['r4032login_user_login_path']) && !drupal_valid_path(($form_state['values']['r4032login_user_login_path']))) {
+    \Drupal::formBuilder()->setErrorByName('r4032login_user_login_path', $form_state, t("The user login form path '%path' is either invalid or you do not have access to it.", array('%path' => $form_state['values']['r4032login_user_login_path'])));
+  }
 }
 
 /**
