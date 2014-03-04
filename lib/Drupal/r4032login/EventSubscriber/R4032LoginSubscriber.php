@@ -67,7 +67,7 @@ class R4032LoginSubscriber implements EventSubscriberInterface {
    * @return \Symfony\Component\HttpFoundation\RedirectResponse
    *   A response that redirects 403 Access Denied pages user login page.
    */
-  public function onKernelExceptionCheck(GetResponseEvent $event) {
+  public function onKernelException(GetResponseEvent $event) {
     $options = array();
     $options['query'] = drupal_get_destination();
     $options['absolute'] = TRUE;
@@ -99,13 +99,13 @@ class R4032LoginSubscriber implements EventSubscriberInterface {
   }
 
   /**
-   * Registers methods as kernel listeners.
+   * {@inheritdoc}
    *
-   * @return array
-   *   An array of event listener definitions.
+   * The priority for the exception must be as low as possible this subscriber
+   * to respond with AccessDeniedHttpException.
    */
   public static function getSubscribedEvents() {
-    $events[KernelEvents::EXCEPTION][] = array('onKernelExceptionCheck', 0);
+    $events[KernelEvents::EXCEPTION][] = array('onKernelException', -255);
     return $events;
   }
 }
