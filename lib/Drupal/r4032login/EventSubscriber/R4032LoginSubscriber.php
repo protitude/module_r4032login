@@ -8,6 +8,7 @@
 namespace Drupal\r4032login\EventSubscriber;
 
 use Drupal\Core\Config\ConfigFactory;
+use Drupal\Core\Routing\UrlGeneratorInterface;
 use Drupal\Core\Session\AccountInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
@@ -19,6 +20,13 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
  * Redirect 403 to User Login event subscriber.
  */
 class R4032LoginSubscriber implements EventSubscriberInterface {
+
+  /**
+   * The url generator service.
+   *
+   * @var \Drupal\Core\Routing\UrlGeneratorInterface
+   */
+  protected $urlGenerator;
 
   /**
    * The configuration object.
@@ -39,10 +47,13 @@ class R4032LoginSubscriber implements EventSubscriberInterface {
    *
    * @param \Drupal\Core\Config\ConfigFactory $config_factory
    *   The configuration system.
+   * @param \Drupal\Core\Routing\UrlGeneratorInterface $url_generator
+   *   The url generator service.
    * @param \Drupal\Core\Session\AccountInterface $current_user
    *   The current user.
    */
-  public function __construct(ConfigFactory $config_factory, AccountInterface $current_user) {
+  public function __construct(ConfigFactory $config_factory, UrlGeneratorInterface $url_generator, AccountInterface $current_user) {
+    $this->urlGenerator = $url_generator;
     $this->config = $config_factory->get('r4032login.settings');
     $this->currentUser = $current_user;
   }
@@ -57,6 +68,10 @@ class R4032LoginSubscriber implements EventSubscriberInterface {
    *   A response that redirects 403 Access Denied pages user login page.
    */
   public function onKernelExceptionCheck(GetResponseEvent $event) {
+    $options = array();
+    $options['query'] = drupal_get_destination();
+    $options['absolute'] = TRUE;
+    $code = $this->config->get('default_redirect_code');
     if ($this->currentUser->isAnonymous()) {
       // Show custom access denied message if set.
       if ($this->config->get('display_denied_message')) {
@@ -65,8 +80,7 @@ class R4032LoginSubscriber implements EventSubscriberInterface {
       }
       // Handle redirection to the login form.
       $login_path = $this->config->get('user_login_path');
-      $code = $this->config->get('default_redirect_code');
-      $response = new RedirectResponse(url($login_path, array('absolute' => TRUE, 'query' => drupal_get_destination())), $code);
+      $response = new RedirectResponse($this->urlGenerator->generateFromPath($login_path, $options), $code);
       $event->setResponse($response);
     }
     else {
@@ -74,7 +88,7 @@ class R4032LoginSubscriber implements EventSubscriberInterface {
       $redirect = $this->config->get('redirect_authenticated_users_to');
       if ($redirect) {
         // Custom access denied page for logged in users.
-        $response = new RedirectResponse(url($redirect, array('absolute' => TRUE)));
+        $response = new RedirectResponse($this->urlGenerator->generateFromPath($redirect, $options), $code);
         $event->setResponse($response);
       }
       else {
