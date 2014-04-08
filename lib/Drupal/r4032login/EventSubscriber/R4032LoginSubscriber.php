@@ -105,7 +105,7 @@ class R4032LoginSubscriber implements EventSubscriberInterface {
    * to respond with AccessDeniedHttpException.
    */
   public static function getSubscribedEvents() {
-    $events[KernelEvents::EXCEPTION][] = array('onKernelException', -255);
+    $events[KernelEvents::EXCEPTION][] = array('onKernelException');
     return $events;
   }
 }
