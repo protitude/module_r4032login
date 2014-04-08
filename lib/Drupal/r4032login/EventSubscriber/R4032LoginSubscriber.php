@@ -64,6 +64,10 @@ class R4032LoginSubscriber implements EventSubscriberInterface {
    * @param \Symfony\Component\HttpKernel\Event\GetResponseEvent $event
    *   The Event to process.
    *
+   * @throws \InvalidArgumentException
+   * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
+   *   Thrown when the access got denied.
+   *
    * @return \Symfony\Component\HttpFoundation\RedirectResponse
    *   A response that redirects 403 Access Denied pages user login page.
    */
