@@ -80,7 +80,8 @@ class R4032LoginSubscriber implements EventSubscriberInterface {
       // Show custom access denied message if set.
       if ($this->config->get('display_denied_message')) {
         $message = $this->config->get('access_denied_message');
-        drupal_set_message($message, 'error');
+        $message_type = $this->config->get('access_denied_message_type');
+        drupal_set_message($message, $message_type);
       }
       // Handle redirection to the login form.
       $login_path = $this->config->get('user_login_path');

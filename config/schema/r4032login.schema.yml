@@ -8,6 +8,19 @@ r4032login.settings:
     access_denied_message:
       type: label
       label: "User login 'access denied' message"
+    access_denied_message_type:
+      type: mapping
+      label: "User login 'access denied' message type"
+      mapping:
+        error:
+          type: string
+          label: 'Error'
+        warning:
+          type: string
+          label: 'Warning'
+        status:
+          type: string
+          label: 'Status'
     redirect_authenticated_users_to:
       type: label
       label: 'Redirect authenticated users to'
@@ -25,5 +38,5 @@ r4032login.settings:
           type: integer
           label: '301 Moved Permanently'
     match_noredirect_pages:
-      type: text
+      type: string
       label: 'Only the listed pages'
