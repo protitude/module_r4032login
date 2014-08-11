@@ -15,6 +15,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Drupal\Component\Utility\Xss;
 
 /**
  * Redirect 403 to User Login event subscriber.
@@ -81,7 +82,7 @@ class R4032LoginSubscriber implements EventSubscriberInterface {
       if ($this->config->get('display_denied_message')) {
         $message = $this->config->get('access_denied_message');
         $message_type = $this->config->get('access_denied_message_type');
-        drupal_set_message($message, $message_type);
+        drupal_set_message(Xss::filterAdmin($message), $message_type);
       }
       // Handle redirection to the login form.
       $login_path = $this->config->get('user_login_path');
