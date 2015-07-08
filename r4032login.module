@@ -5,6 +5,8 @@
  * Redirect denied pages to the user login form.
  */
 
+use Drupal\Core\Form\FormStateInterface;
+
 /**
  * Implements hook_form_FORM_ID_alter().
  *
@@ -13,7 +15,7 @@
  *
  * @see r4032login_form_system_site_information_settings_form_submit()
  */
-function r4032login_form_system_site_information_settings_alter(&$form, &$form_state, $form_id) {
+function r4032login_form_system_site_information_settings_alter(&$form, FormStateInterface $form_state, $form_id) {
   $config = \Drupal::config('r4032login.settings');
 
   $form['error_page']['r4032login'] = array(
@@ -111,12 +113,13 @@ function r4032login_form_system_site_information_settings_alter(&$form, &$form_s
  *
  * @see r4032login_form_system_site_information_settings_alter()
  */
-function r4032login_form_system_site_information_settings_validate($form, &$form_state) {
-  if (!empty($form_state['values']['r4032login_redirect_authenticated_users_to']) && !drupal_valid_path(($form_state['values']['r4032login_redirect_authenticated_users_to']))) {
-    \Drupal::formBuilder()->setErrorByName('r4032login_redirect_authenticated_users_to', $form_state, t("The redirect authenticated users path '%path' is either invalid or you do not have access to it.", array('%path' => $form_state['values']['r4032login_user_login_path'])));
+function r4032login_form_system_site_information_settings_validate($form, FormStateInterface $form_state) {
+  $path_validator = \Drupal::pathValidator();
+  if (!$form_state->isValueEmpty('r4032login_redirect_authenticated_users_to') && !$path_validator->isValid($form_state->getValue(('r4032login_redirect_authenticated_users_to')))) {
+    $form_state->setErrorByName('r4032login_redirect_authenticated_users_to', t("The redirect authenticated users path '%path' is either invalid or you do not have access to it.", array('%path' => $form_state->getValue('r4032login_redirect_authenticated_users_to'))));
   }
-  if (!empty($form_state['values']['r4032login_user_login_path']) && !drupal_valid_path(($form_state['values']['r4032login_user_login_path']))) {
-    \Drupal::formBuilder()->setErrorByName('r4032login_user_login_path', $form_state, t("The user login form path '%path' is either invalid or you do not have access to it.", array('%path' => $form_state['values']['r4032login_user_login_path'])));
+  if (!$form_state->isValueEmpty('r4032login_user_login_path') && !$path_validator->isValid($form_state->getValue('r4032login_user_login_path'))) {
+    $form_state->setErrorByName('r4032login_user_login_path', t("The user login form path '%path' is either invalid or you do not have access to it.", array('%path' => $form_state->getValue('r4032login_user_login_path'))));
   }
 }
 
@@ -125,15 +128,15 @@ function r4032login_form_system_site_information_settings_validate($form, &$form
  *
  * @see r4032login_form_system_site_information_settings_alter()
  */
-function r4032login_form_system_site_information_settings_form_submit($form, &$form_state) {
-  \Drupal::config('r4032login.settings')
-    ->set('display_denied_message', $form_state['values']['r4032login_display_denied_message'])
-    ->set('access_denied_message', $form_state['values']['r4032login_access_denied_message'])
-    ->set('access_denied_message_type', $form_state['values']['r4032login_access_denied_message_type'])
-    ->set('redirect_authenticated_users_to', $form_state['values']['r4032login_redirect_authenticated_users_to'])
-    ->set('user_login_path', $form_state['values']['r4032login_user_login_path'])
-    ->set('default_redirect_code', $form_state['values']['r4032login_default_redirect_code'])
-    ->set('match_noredirect_pages', $form_state['values']['r4032login_match_noredirect_pages'])
+function r4032login_form_system_site_information_settings_form_submit($form, FormStateInterface $form_state) {
+  \Drupal::configFactory()->getEditable('r4032login.settings')
+    ->set('display_denied_message', $form_state->getValue('r4032login_display_denied_message'))
+    ->set('access_denied_message', $form_state->getValue('r4032login_access_denied_message'))
+    ->set('access_denied_message_type', $form_state->getValue('r4032login_access_denied_message_type'))
+    ->set('redirect_authenticated_users_to', $form_state->getValue('r4032login_redirect_authenticated_users_to'))
+    ->set('user_login_path', $form_state->getValue('r4032login_user_login_path'))
+    ->set('default_redirect_code', $form_state->getValue('r4032login_default_redirect_code'))
+    ->set('match_noredirect_pages', $form_state->getValue('r4032login_match_noredirect_pages'))
     ->save();
 }
 
