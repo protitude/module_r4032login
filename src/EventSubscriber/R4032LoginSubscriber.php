@@ -10,6 +10,7 @@ namespace Drupal\r4032login\EventSubscriber;
 use Drupal\Core\Config\ConfigFactory;
 use Drupal\Core\Routing\UrlGeneratorInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Routing\RedirectDestinationInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -44,6 +45,13 @@ class R4032LoginSubscriber implements EventSubscriberInterface {
   protected $currentUser;
 
   /**
+   * The redirect destination service.
+   *
+   * @var \Drupal\Core\Routing\RedirectDestinationInterface
+   */
+  protected $redirectDestination;
+
+  /**
    * Constructs a new R4032LoginSubscriber.
    *
    * @param \Drupal\Core\Config\ConfigFactory $config_factory
@@ -52,11 +60,14 @@ class R4032LoginSubscriber implements EventSubscriberInterface {
    *   The url generator service.
    * @param \Drupal\Core\Session\AccountInterface $current_user
    *   The current user.
+   * @param \Drupal\Core\Routing\RedirectDestinationInterface $redirect_destination
+   *   The redirect destination service.
    */
-  public function __construct(ConfigFactory $config_factory, UrlGeneratorInterface $url_generator, AccountInterface $current_user) {
+  public function __construct(ConfigFactory $config_factory, UrlGeneratorInterface $url_generator, AccountInterface $current_user, RedirectDestinationInterface $redirect_destination) {
     $this->urlGenerator = $url_generator;
     $this->config = $config_factory->get('r4032login.settings');
     $this->currentUser = $current_user;
+    $this->redirectDestination = $redirect_destination;
   }
 
   /**
@@ -70,7 +81,7 @@ class R4032LoginSubscriber implements EventSubscriberInterface {
    */
   public function onKernelException(GetResponseEvent $event) {
     $options = array();
-    $options['query'] = drupal_get_destination();
+    $options['query'] = $this->redirectDestination->getAsArray();
     $options['absolute'] = TRUE;
     $code = $this->config->get('default_redirect_code');
     if ($this->currentUser->isAnonymous()) {
