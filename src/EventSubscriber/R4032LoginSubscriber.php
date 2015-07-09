@@ -7,7 +7,7 @@
 
 namespace Drupal\r4032login\EventSubscriber;
 
-use Drupal\Core\Config\ConfigFactory;
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Routing\UrlGeneratorInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Routing\RedirectDestinationInterface;
@@ -31,11 +31,11 @@ class R4032LoginSubscriber implements EventSubscriberInterface {
   protected $urlGenerator;
 
   /**
-   * The configuration object.
+   * The configuration factory.
    *
-   * @var \Drupal\Core\Config\Config
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
    */
-  protected $config;
+  protected $configFactory;
 
   /**
    * The current user.
@@ -54,8 +54,8 @@ class R4032LoginSubscriber implements EventSubscriberInterface {
   /**
    * Constructs a new R4032LoginSubscriber.
    *
-   * @param \Drupal\Core\Config\ConfigFactory $config_factory
-   *   The configuration system.
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   *   The configuration factory.
    * @param \Drupal\Core\Routing\UrlGeneratorInterface $url_generator
    *   The url generator service.
    * @param \Drupal\Core\Session\AccountInterface $current_user
@@ -63,9 +63,9 @@ class R4032LoginSubscriber implements EventSubscriberInterface {
    * @param \Drupal\Core\Routing\RedirectDestinationInterface $redirect_destination
    *   The redirect destination service.
    */
-  public function __construct(ConfigFactory $config_factory, UrlGeneratorInterface $url_generator, AccountInterface $current_user, RedirectDestinationInterface $redirect_destination) {
+  public function __construct(ConfigFactoryInterface $config_factory, UrlGeneratorInterface $url_generator, AccountInterface $current_user, RedirectDestinationInterface $redirect_destination) {
     $this->urlGenerator = $url_generator;
-    $this->config = $config_factory->get('r4032login.settings');
+    $this->configFactory = $config_factory;
     $this->currentUser = $current_user;
     $this->redirectDestination = $redirect_destination;
   }
@@ -80,25 +80,26 @@ class R4032LoginSubscriber implements EventSubscriberInterface {
    *   Thrown when the access is denied and redirects to user login page.
    */
   public function onKernelException(GetResponseEvent $event) {
+    $config = $this->configFactory->get('r4032login.settings');
     $options = array();
     $options['query'] = $this->redirectDestination->getAsArray();
     $options['absolute'] = TRUE;
-    $code = $this->config->get('default_redirect_code');
+    $code = $config->get('default_redirect_code');
     if ($this->currentUser->isAnonymous()) {
       // Show custom access denied message if set.
-      if ($this->config->get('display_denied_message')) {
-        $message = $this->config->get('access_denied_message');
-        $message_type = $this->config->get('access_denied_message_type');
+      if ($config->get('display_denied_message')) {
+        $message = $config->get('access_denied_message');
+        $message_type = $config->get('access_denied_message_type');
         drupal_set_message(Xss::filterAdmin($message), $message_type);
       }
       // Handle redirection to the login form.
-      $login_path = $this->config->get('user_login_path');
+      $login_path = $config->get('user_login_path');
       $response = new RedirectResponse($this->urlGenerator->generateFromPath($login_path, $options), $code);
       $event->setResponse($response);
     }
     else {
       // Check to see if we are to redirect the user.
-      $redirect = $this->config->get('redirect_authenticated_users_to');
+      $redirect = $config->get('redirect_authenticated_users_to');
       if ($redirect) {
         // Custom access denied page for logged in users.
         $response = new RedirectResponse($this->urlGenerator->generateFromPath($redirect, $options), $code);
