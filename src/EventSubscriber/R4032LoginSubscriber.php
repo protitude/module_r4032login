@@ -80,6 +80,10 @@ class R4032LoginSubscriber implements EventSubscriberInterface {
    *   Thrown when the access is denied and redirects to user login page.
    */
   public function onKernelException(GetResponseEvent $event) {
+    $exception = $event->getException();
+    if (!($exception instanceof AccessDeniedHttpException)) {
+      return;
+    }
     $config = $this->configFactory->get('r4032login.settings');
     $options = array();
     $options['query'] = $this->redirectDestination->getAsArray();
