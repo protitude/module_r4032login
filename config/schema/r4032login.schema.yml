@@ -26,7 +26,7 @@ r4032login.settings:
       label: 'Redirect authenticated users to'
     user_login_path:
       type: path
-      label: 'user/login'
+      label: '/user/login'
     default_redirect_code:
       type: mapping
       label: 'HTTP redirect code'
