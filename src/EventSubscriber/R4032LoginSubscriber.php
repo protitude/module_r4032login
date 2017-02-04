@@ -99,7 +99,13 @@ class R4032LoginSubscriber implements EventSubscriberInterface {
       $redirect = $config->get('redirect_authenticated_users_to');
       if ($redirect) {
         // Custom access denied page for logged in users.
-        $url = Url::fromUserInput($redirect, $options)->toString();
+        if ($redirect === '<front>') {
+          $url = \Drupal::urlGenerator()->generate('<front>');
+        }
+        else {
+          $url = Url::fromUserInput($redirect, $options)->toString();
+        }
+
         $response = new RedirectResponse($url, $code);
         $event->setResponse($response);
       }
