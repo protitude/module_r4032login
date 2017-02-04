@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\r4032login\EventSubscriber\R4032LoginSubscriber.
- */
-
 namespace Drupal\r4032login\EventSubscriber;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
