@@ -111,7 +111,7 @@ class R4032LoginSubscriber implements EventSubscriberInterface {
       }
       else {
         // Display the default access denied page.
-        throw new AccessDeniedHttpException();
+        return new AccessDeniedHttpException();
       }
     }
   }
