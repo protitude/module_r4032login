@@ -23,3 +23,6 @@ r4032login.settings:
     match_noredirect_pages:
       type: string
       label: 'Only the listed pages'
+    langcode:
+      type: string
+      label: 'Language code'
