@@ -4,6 +4,7 @@ namespace Drupal\r4032login\EventSubscriber;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\EventSubscriber\HttpExceptionSubscriberBase;
+use Drupal\Core\Path\PathMatcherInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Routing\RedirectDestinationInterface;
 use Drupal\Core\Url;
@@ -38,6 +39,13 @@ class R4032LoginSubscriber extends HttpExceptionSubscriberBase {
   protected $redirectDestination;
 
   /**
+   * The path matcher.
+   *
+   * @var \Drupal\Core\Path\PathMatcherInterface
+   */
+  protected $pathMatcher;
+
+  /**
    * Constructs a new R4032LoginSubscriber.
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
@@ -46,11 +54,14 @@ class R4032LoginSubscriber extends HttpExceptionSubscriberBase {
    *   The current user.
    * @param \Drupal\Core\Routing\RedirectDestinationInterface $redirect_destination
    *   The redirect destination service.
+   * @param PathMatcherInterface $path_matcher
+   *   The path matcher.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, AccountInterface $current_user, RedirectDestinationInterface $redirect_destination) {
+  public function __construct(ConfigFactoryInterface $config_factory, AccountInterface $current_user, RedirectDestinationInterface $redirect_destination, PathMatcherInterface $path_matcher) {
     $this->configFactory = $config_factory;
     $this->currentUser = $current_user;
     $this->redirectDestination = $redirect_destination;
+    $this->pathMatcher = $path_matcher;
   }
 
   /**
@@ -72,6 +83,21 @@ class R4032LoginSubscriber extends HttpExceptionSubscriberBase {
     $options['query'] = $this->redirectDestination->getAsArray();
     $options['absolute'] = TRUE;
     $code = $config->get('default_redirect_code');
+
+    // Check if the path should be ignored.
+    $noredirect_pages = trim($config->get('match_noredirect_pages'));
+    if ($noredirect_pages !== '') {
+      $path_to_match = $this->redirectDestination->get();
+      try {
+        // Clean up path from possible language prefix, GET arguments, etc.
+        $path_to_match = '/' . Url::fromUserInput($path_to_match)->getInternalPath();
+      } catch (\Exception $e) {
+      }
+      if ($this->pathMatcher->matchPath($path_to_match, $noredirect_pages)) {
+        return;
+      }
+    }
+
     if ($this->currentUser->isAnonymous()) {
       // Show custom access denied message if set.
       if ($config->get('display_denied_message')) {
