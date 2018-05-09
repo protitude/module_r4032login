@@ -8,6 +8,8 @@ use Drupal\Core\Path\PathMatcherInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Routing\RedirectDestinationInterface;
 use Drupal\Core\Url;
+use Drupal\r4032login\Event\RedirectEvent;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Drupal\Component\Utility\Xss;
@@ -46,6 +48,13 @@ class R4032LoginSubscriber extends HttpExceptionSubscriberBase {
   protected $pathMatcher;
 
   /**
+   * An event dispatcher instance to use for map events.
+   *
+   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
+   */
+  protected $eventDispatcher;
+
+  /**
    * Constructs a new R4032LoginSubscriber.
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
@@ -56,12 +65,15 @@ class R4032LoginSubscriber extends HttpExceptionSubscriberBase {
    *   The redirect destination service.
    * @param PathMatcherInterface $path_matcher
    *   The path matcher.
+   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
+   *   The event dispatcher.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, AccountInterface $current_user, RedirectDestinationInterface $redirect_destination, PathMatcherInterface $path_matcher) {
+  public function __construct(ConfigFactoryInterface $config_factory, AccountInterface $current_user, RedirectDestinationInterface $redirect_destination, PathMatcherInterface $path_matcher, EventDispatcherInterface $event_dispatcher) {
     $this->configFactory = $config_factory;
     $this->currentUser = $current_user;
     $this->redirectDestination = $redirect_destination;
     $this->pathMatcher = $path_matcher;
+    $this->eventDispatcher = $event_dispatcher;
   }
 
   /**
@@ -107,6 +119,13 @@ class R4032LoginSubscriber extends HttpExceptionSubscriberBase {
       }
       // Handle redirection to the login form.
       $login_path = $config->get('user_login_path');
+
+      // Allow to alter the url or options before to redirect.
+      $redirectEvent = new RedirectEvent($login_path, $options);
+      $this->eventDispatcher->dispatch(RedirectEvent::EVENT_NAME, $redirectEvent);
+      $login_path = $redirectEvent->getUrl();
+      $options = $redirectEvent->getOptions();
+
       $url = Url::fromUserInput($login_path, $options)->toString();
       $response = new RedirectResponse($url, $code);
       $event->setResponse($response);
