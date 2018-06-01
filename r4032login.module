@@ -86,12 +86,19 @@ function r4032login_form_system_site_information_settings_alter(&$form, FormStat
     ),
     '#default_value' => $config->get('default_redirect_code'),
   );
+  $form['error_page']['r4032login']['r4032login_destination_parameter_override'] = array(
+    '#type' => 'textfield',
+    '#weight' => 11,
+    '#title' => t("Destination parameter override"),
+    '#description' => t("The parameter to use when setting the return destination once login has succeeded. By default Drupal uses 'destination', but overriding this may be necessary if using an external login system such as CAS, Shibboleth or OAuth."),
+    '#default_value' => $config->get('destination_parameter_override'),
+  );
   $form['error_page']['r4032login']['matching_paths'] = array(
     '#type' => 'details',
     '#title' => t('Skip redirect for matching pages'),
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
-    '#weight' => 11,
+    '#weight' => 12,
   );
   $form['error_page']['r4032login']['matching_paths']['r4032login_match_noredirect_pages'] = array(
     '#type' => 'textarea',
@@ -135,6 +142,7 @@ function r4032login_form_system_site_information_settings_form_submit($form, For
     ->set('redirect_authenticated_users_to', $form_state->getValue('r4032login_redirect_authenticated_users_to'))
     ->set('user_login_path', $form_state->getValue('r4032login_user_login_path'))
     ->set('default_redirect_code', $form_state->getValue('r4032login_default_redirect_code'))
+    ->set('destination_parameter_override', $form_state->getValue('r4032login_destination_parameter_override'))
     ->set('match_noredirect_pages', $form_state->getValue('r4032login_match_noredirect_pages'))
     ->save();
 }

@@ -92,7 +92,12 @@ class R4032LoginSubscriber extends HttpExceptionSubscriberBase {
   public function on403(GetResponseEvent $event) {
     $config = $this->configFactory->get('r4032login.settings');
     $options = array();
-    $options['query'] = $this->redirectDestination->getAsArray();
+    if (empty($config->get('destination_parameter_override'))) {
+      $options['query'] = $this->redirectDestination->getAsArray();
+    }
+    else {
+      $options['query'][$config->get('destination_parameter_override')] = $this->redirectDestination->get();
+    }
     $options['absolute'] = TRUE;
     $code = $config->get('default_redirect_code');
 
