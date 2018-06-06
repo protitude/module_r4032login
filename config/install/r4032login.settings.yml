@@ -6,4 +6,5 @@ user_login_path: '/user/login'
 default_redirect_code: 302
 destination_parameter_override: ''
 match_noredirect_pages: ''
+redirect_to_destination: true
 langcode: en

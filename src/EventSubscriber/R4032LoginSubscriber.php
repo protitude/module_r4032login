@@ -126,23 +126,27 @@ class R4032LoginSubscriber extends HttpExceptionSubscriberBase {
       // Determine the HTTP redirect code.
       $code = $config->get('default_redirect_code');
 
-      // Determine the destination parameter.
-      $destination = $this->redirectDestination->get();
-      if ($externalRedirect) {
-        $destination = Url::fromUserInput($destination, [
-          'absolute' => TRUE,
-        ])->toString();
-      }
-
       // Determine the url options.
       $options = [
         'absolute' => TRUE,
       ];
-      if (empty($config->get('destination_parameter_override'))) {
-        $options['query']['destination'] = $destination;
-      }
-      else {
-        $options['query'][$config->get('destination_parameter_override')] = $destination;
+
+      // Determine the destination parameter and add it as options for the url build.
+      if ($config->get('redirect_to_destination')) {
+        $destination = $this->redirectDestination->get();
+
+        if ($externalRedirect) {
+          $destination = Url::fromUserInput($destination, [
+            'absolute' => TRUE,
+          ])->toString();
+        }
+
+        if (empty($config->get('destination_parameter_override'))) {
+          $options['query']['destination'] = $destination;
+        }
+        else {
+          $options['query'][$config->get('destination_parameter_override')] = $destination;
+        }
       }
 
       // Allow to alter the url or options before to redirect.

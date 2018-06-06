@@ -24,6 +24,12 @@ function r4032login_form_system_site_information_settings_alter(&$form, FormStat
     '#description' => t('Redirect anonymous users from 403 Access Denied pages to the /user/login page.'),
     '#open' => TRUE,
   );
+  $form['error_page']['r4032login']['r4032login_redirect_to_destination'] = array(
+    '#type' => 'checkbox',
+    '#weight' => 4,
+    '#title' => t('Redirect user to the page they tried to access after login'),
+    '#default_value' => $config->get('redirect_to_destination'),
+  );
   $form['error_page']['r4032login']['r4032login_display_denied_message'] = array(
     '#type' => 'checkbox',
     '#weight' => 5,
@@ -136,6 +142,7 @@ function r4032login_form_system_site_information_settings_validate($form, FormSt
  */
 function r4032login_form_system_site_information_settings_form_submit($form, FormStateInterface $form_state) {
   \Drupal::configFactory()->getEditable('r4032login.settings')
+    ->set('redirect_to_destination', $form_state->getValue('r4032login_redirect_to_destination'))
     ->set('display_denied_message', $form_state->getValue('r4032login_display_denied_message'))
     ->set('access_denied_message', $form_state->getValue('r4032login_access_denied_message'))
     ->set('access_denied_message_type', $form_state->getValue('r4032login_access_denied_message_type'))

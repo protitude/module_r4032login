@@ -26,6 +26,9 @@ r4032login.settings:
     match_noredirect_pages:
       type: string
       label: 'Only the listed pages'
+    redirect_to_destination:
+      type: boolean
+      label: 'Redirect user to the page they tried to access after login'
     langcode:
       type: string
       label: 'Language code'
