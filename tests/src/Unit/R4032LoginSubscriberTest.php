@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\r4032login\Unit\EventSubscriber\R4032LoginSubscriberTest.
- */
-
 namespace Drupal\Tests\r4032login\Unit {
 
   use Drupal\Core\DependencyInjection\ContainerBuilder;
@@ -86,7 +81,17 @@ namespace Drupal\Tests\r4032login\Unit {
      */
     protected function setUp() {
       $this->kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
-      $this->configFactory = $this->getConfigFactoryStub(array('r4032login.settings' => array('display_denied_message' => TRUE, 'access_denied_message' => 'Access denied. You must log in to view this page.', 'access_denied_message_type' => 'error', 'redirect_authenticated_users_to' => '', 'user_login_path' => '/user/login', 'default_redirect_code' => 302, 'match_noredirect_pages' => '',),));
+      $this->configFactory = $this->getConfigFactoryStub([
+        'r4032login.settings' => [
+          'display_denied_message' => TRUE,
+          'access_denied_message' => 'Access denied. You must log in to view this page.',
+          'access_denied_message_type' => 'error',
+          'redirect_authenticated_users_to' => '',
+          'user_login_path' => '/user/login',
+          'default_redirect_code' => 302,
+          'match_noredirect_pages' => '',
+        ],
+      ]);
       $this->currentUser = $this->getMock('Drupal\Core\Session\AccountInterface');
       $this->redirectDestination = $this->getMock('\Drupal\Core\Routing\RedirectDestinationInterface');
       $this->pathMatcher = $this->getMock('\Drupal\Core\Path\PathMatcherInterface');
@@ -128,13 +133,17 @@ namespace Drupal\Tests\r4032login\Unit {
      * @dataProvider providerRequests
      */
     public function testAnonymousRedirect(Request $request, array $config_values, $expected_url) {
-      $config = $this->getConfigFactoryStub(array('r4032login.settings' => $config_values));
+      $config = $this->getConfigFactoryStub([
+        'r4032login.settings' => $config_values,
+      ]);
       $this->currentUser->expects($this->any())->method('isAnonymous')->willReturn(TRUE);
 
       $r4032login = new R4032LoginSubscriber($config, $this->currentUser, $this->redirectDestination, $this->pathMatcher, $this->eventDispatcher);
       $event = new GetResponseForExceptionEvent($this->kernel, $request, HttpKernelInterface::MASTER_REQUEST, new AccessDeniedHttpException());
       $dispatcher = new EventDispatcher();
-      $dispatcher->addListener(KernelEvents::EXCEPTION, array($r4032login, 'on403'));
+      $dispatcher->addListener(KernelEvents::EXCEPTION, [
+        $r4032login, 'on403',
+      ]);
       $dispatcher->dispatch(KernelEvents::EXCEPTION, $event);
 
       $response = $event->getResponse();
@@ -158,13 +167,17 @@ namespace Drupal\Tests\r4032login\Unit {
      * @dataProvider providerRequests
      */
     public function testAuthenticatedRedirect(Request $request, array $config_values, $expected_url) {
-      $config = $this->getConfigFactoryStub(array('r4032login.settings' => $config_values));
+      $config = $this->getConfigFactoryStub([
+        'r4032login.settings' => $config_values,
+      ]);
       $this->currentUser->expects($this->any())->method('isAuthenticated')->willReturn(TRUE);
 
       $r4032login = new R4032LoginSubscriber($config, $this->currentUser, $this->redirectDestination, $this->pathMatcher, $this->eventDispatcher);
       $event = new GetResponseForExceptionEvent($this->kernel, $request, HttpKernelInterface::MASTER_REQUEST, new AccessDeniedHttpException());
       $dispatcher = new EventDispatcher();
-      $dispatcher->addListener(KernelEvents::EXCEPTION, array($r4032login, 'on403'));
+      $dispatcher->addListener(KernelEvents::EXCEPTION, [
+        $r4032login, 'on403',
+      ]);
       $dispatcher->dispatch(KernelEvents::EXCEPTION, $event);
 
       $response = $event->getResponse();
@@ -179,12 +192,14 @@ namespace Drupal\Tests\r4032login\Unit {
      * @covers ::getSubscribedEvents
      */
     public function testGetSubscribedEvents() {
-      $expected = array(KernelEvents::EXCEPTION => array(
-        array(
-          'onException',
-          0,
-        ))
-      );
+      $expected = [
+        KernelEvents::EXCEPTION => [
+          [
+            'onException',
+            0,
+          ],
+        ],
+      ];
       $actual = R4032LoginSubscriber::getSubscribedEvents();
       $this->assertSame($expected, $actual);
     }
@@ -196,7 +211,36 @@ namespace Drupal\Tests\r4032login\Unit {
      *   An array of Request objects, configuration values, and expected paths.
      */
     public function providerRequests() {
-      return array(array(new Request(array('destination' => 'test')), array('display_denied_message' => TRUE, 'access_denied_message' => 'Access denied. You must log in to view this page.', 'access_denied_message_type' => 'error', 'redirect_authenticated_users_to' => '/user/login', 'user_login_path' => '/user/login', 'default_redirect_code' => 302, 'match_noredirect_pages' => '',), 'base:user/login',), array(new Request(array('destination' => 'test')), array('display_denied_message' => TRUE, 'access_denied_message' => 'Access denied. You must log in to view this page.', 'access_denied_message_type' => 'error', 'redirect_authenticated_users_to' => '/admin', 'user_login_path' => '/user/login', 'default_redirect_code' => 302, 'match_noredirect_pages' => '',), 'base:admin',),);
+      return [
+        [
+          new Request([
+            'destination' => 'test',
+          ]), [
+            'display_denied_message' => TRUE,
+            'access_denied_message' => 'Access denied. You must log in to view this page.',
+            'access_denied_message_type' => 'error',
+            'redirect_authenticated_users_to' => '/user/login',
+            'user_login_path' => '/user/login',
+            'default_redirect_code' => 302,
+            'match_noredirect_pages' => '',
+          ],
+          'base:user/login',
+        ],
+        [
+          new Request([
+            'destination' => 'test',
+          ]),
+          [
+            'display_denied_message' => TRUE,
+            'access_denied_message' => 'Access denied. You must log in to view this page.',
+            'access_denied_message_type' => 'error',
+            'redirect_authenticated_users_to' => '/admin',
+            'user_login_path' => '/user/login',
+            'default_redirect_code' => 302,
+            'match_noredirect_pages' => '',
+          ], 'base:admin',
+        ],
+      ];
     }
 
     /**
@@ -207,11 +251,13 @@ namespace Drupal\Tests\r4032login\Unit {
      */
     public function providerInvalidExceptions() {
       $kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
-      $exceptions = array();
+      $exceptions = [];
       foreach (get_declared_classes() as $name) {
         $class = new \ReflectionClass($name);
         if ($class->isSubclassOf('Exception')) {
-          $exceptions[] = array(new GetResponseForExceptionEvent($kernel, new Request(), HttpKernelInterface::MASTER_REQUEST, $this->getMockBuilder($name)->disableOriginalConstructor()->getMock()),);
+          $exceptions[] = [
+            new GetResponseForExceptionEvent($kernel, new Request(), HttpKernelInterface::MASTER_REQUEST, $this->getMockBuilder($name)->disableOriginalConstructor()->getMock()),
+          ];
         }
       }
       return $exceptions;
@@ -221,11 +267,14 @@ namespace Drupal\Tests\r4032login\Unit {
 }
 
 namespace {
+
   if (!function_exists('drupal_set_message')) {
+
     /**
      * Replaces drupal_set_message().
      */
     function drupal_set_message() {
     }
+
   }
 }

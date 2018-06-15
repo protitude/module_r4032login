@@ -2,25 +2,25 @@
 
 namespace Drupal\r4032login\Event;
 
-use Drupal\Core\Entity\EntityInterface;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
  * Event that is fired just before the redirection is perform.
  */
-
 class RedirectEvent extends Event {
 
   const EVENT_NAME = 'r4032login.redirect';
 
   /**
    * The redirect url.
+   *
    * @var string
    */
   private $url;
 
   /**
    * The redirect options.
+   *
    * @var array
    */
   private $options;
@@ -33,7 +33,7 @@ class RedirectEvent extends Event {
    * @param array $options
    *   The redirect options.
    */
-  public function __construct($url, $options) {
+  public function __construct($url, array $options) {
     $this->url = $url;
     $this->options = $options;
   }
@@ -42,6 +42,7 @@ class RedirectEvent extends Event {
    * Getter for url property.
    *
    * @return string
+   *   The redirection url.
    */
   public function getUrl() {
     return $this->url;
@@ -61,6 +62,7 @@ class RedirectEvent extends Event {
    * Getter for options property.
    *
    * @return array
+   *   The url redirection options.
    */
   public function getOptions() {
     return $this->options;
@@ -72,7 +74,7 @@ class RedirectEvent extends Event {
    * @param array $options
    *   The url options.
    */
-  public function setOptions($options) {
+  public function setOptions(array $options) {
     $this->options = $options;
   }
 

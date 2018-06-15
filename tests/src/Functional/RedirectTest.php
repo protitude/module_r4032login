@@ -41,7 +41,7 @@ class RedirectTest extends BrowserTestBase {
    *
    * @dataProvider skipRedirectDataProvider
    */
-  public function testSkipRedirect($path, $options, $code, $destination) {
+  public function testSkipRedirect($path, array $options, $code, $destination) {
     $this->drupalGet($path, $options);
     $this->assertSession()->statusCodeEquals($code);
     $this->assertSession()->addressEquals($destination);
@@ -52,10 +52,34 @@ class RedirectTest extends BrowserTestBase {
    */
   public function skipRedirectDataProvider() {
     return [
-      ['/admin/config/development', [], 403, '/admin/config/development'],
-      ['/admin/config', [], 200, '/user/login'],
-      ['/admin/modules', ['query' => ['foo' => 'bar']], 403, '/admin/modules?foo=bar'],
-      ['/admin/modules/uninstall', [], 200, '/user/login'],
+      [
+        '/admin/config/development',
+        [],
+        403,
+        '/admin/config/development',
+      ],
+      [
+        '/admin/config',
+        [],
+        200,
+        '/user/login',
+      ],
+      [
+        '/admin/modules',
+        [
+          'query' => [
+            'foo' => 'bar',
+          ],
+        ],
+        403,
+        '/admin/modules?foo=bar',
+      ],
+      [
+        '/admin/modules/uninstall',
+        [],
+        200,
+        '/user/login',
+      ],
     ];
   }
 

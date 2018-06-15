@@ -65,7 +65,7 @@ class R4032LoginSubscriber extends HttpExceptionSubscriberBase {
    *   The current user.
    * @param \Drupal\Core\Routing\RedirectDestinationInterface $redirect_destination
    *   The redirect destination service.
-   * @param PathMatcherInterface $path_matcher
+   * @param \Drupal\Core\Path\PathMatcherInterface $path_matcher
    *   The path matcher.
    * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
    *   The event dispatcher.
@@ -131,7 +131,8 @@ class R4032LoginSubscriber extends HttpExceptionSubscriberBase {
         'absolute' => TRUE,
       ];
 
-      // Determine the destination parameter and add it as options for the url build.
+      // Determine the destination parameter
+      // and add it as options for the url build.
       if ($config->get('redirect_to_destination')) {
         $destination = $this->redirectDestination->get();
 
