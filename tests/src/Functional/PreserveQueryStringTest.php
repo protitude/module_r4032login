@@ -17,7 +17,7 @@ class PreserveQueryStringTest extends BrowserTestBase {
   protected static $modules = ['r4032login'];
 
   /**
-   * Tests skip redirect.
+   * Tests query string preservation.
    *
    * @param string $path
    *   Request path.
@@ -29,6 +29,7 @@ class PreserveQueryStringTest extends BrowserTestBase {
    *   Resulting URL.
    *
    * @dataProvider preserveQueryStringDataProvider
+   *
    * @throws \Behat\Mink\Exception\ExpectationException
    */
   public function testPreserveQueryString($path, array $options, $code, $destination) {

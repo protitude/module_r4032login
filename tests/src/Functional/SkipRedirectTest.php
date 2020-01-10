@@ -38,6 +38,7 @@ class SkipRedirectTest extends BrowserTestBase {
    *   Resulting URL.
    *
    * @dataProvider skipRedirectDataProvider
+   *
    * @throws \Behat\Mink\Exception\ExpectationException
    */
   public function testSkipRedirect($path, $code, $destination) {
