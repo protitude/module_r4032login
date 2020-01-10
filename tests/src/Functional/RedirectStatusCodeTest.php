@@ -56,6 +56,10 @@ class RedirectStatusCodeTest extends BrowserTestBase {
         302,
         302,
       ],
+      [
+        307,
+        307,
+      ],
     ];
   }
 
