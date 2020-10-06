@@ -1,5 +1,5 @@
 {
-  "name": "drupal/r4032login",
+  "name": "protitude/r4032login",
   "type": "drupal-module",
   "description": "Redirect 403 to User Login",
   "keywords": ["Drupal"],
